@@ -9,6 +9,7 @@ export default {
     {
       fontFamily: {
         'poppins': ['Poppins', 'sans-serif'],
+        'Jetbrains': ['JetBrains Mono', 'monospace']
       },
       boxShadow :{
         '3xl' : ' 0px 5px 15px rgba(0, 0, 0, 0.35)'
