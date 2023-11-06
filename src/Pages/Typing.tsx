@@ -2,10 +2,12 @@ import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { BsPlay } from 'react-icons/bs';
 import { MdOutlineRestartAlt} from 'react-icons/md';
+import Results from "../Components/Results";
 
 // Creating a Pragraph
 
 const Typing = () => {
+
   interface Paragraph {
     paragraph: string;
     number_of_words: number;
@@ -16,8 +18,11 @@ const Typing = () => {
   const [wordscount, setwordscount] = useState<number>(0);
   const [isTyping, setisTyping] = useState<boolean>(true);
   const [starttime, setstarttime] = useState<Date>(new Date());
-  // const [IntervalId, setIntervalId] = useState<number>()
-  // const [second, setsecond] = useState<number>(1)
+  const [speed, setspeed] = useState<number | undefined>(undefined);
+  const [Time, setTime] = useState<number | undefined>(undefined);
+  const [Accuracy, setAccuracy] = useState<number | undefined>(undefined);
+
+
   let current_Index: number = 0;
   // Calling the Backend Api call
 
@@ -49,12 +54,10 @@ const Typing = () => {
     setletter(letterElements);
     console.log(letter);
   };
-  useEffect(() => {
-    getPara();
-  }, []);
+
 
   // Function to find the typing speed
-
+  let IntervalId : number | undefined = undefined;
   // start the Clock
   const startClock = (): void => {
     setstarttime(new Date());
@@ -62,32 +65,47 @@ const Typing = () => {
     let sec = 0;
     let min = 0;
     let hour = 0;
-    // let intervalid = 
-    setInterval(()=>{
+
+    if (IntervalId) {
+      clearInterval(IntervalId);
+    }
+
+
+    IntervalId = setInterval(() => {
       sec++;
-      if(sec === 60){
+      if (sec === 60) {
         sec = 0;
         min++;
       }
-      if(min === 60){
+      if (min === 60) {
         min = 0;
         hour++;
       }
       time.innerHTML = `${hour}:${min}:${sec}`;
-    },1000)
-    // setIntervalId(intervalid);
-  }
+    }, 1000);
+  };
 
-  // const stopClock = (): void => {
-  //   const time = document.querySelector(".timeclock") as HTMLHeadingElement;
-  //   time.innerHTML = `00:00`;
-  //   clearInterval(IntervalId);
-  // }
+  const stopClock = (): void => {
+    console.log(IntervalId)
+    const time = document.querySelector(".timeclock") as HTMLHeadingElement;
+    time.innerHTML = `00:00`;
+    if(IntervalId)
+    {
+      clearInterval(IntervalId);
+    }
+    
+  }
    
 
   // Function to Track the Keystrokes and marking right and wrong Typing
   let wordc = 0;
   const keydown = (event : KeyboardEvent) => {
+    // Prevent the deafult behaviour of the keys
+    if(event.key === " ")
+    {
+      event.preventDefault();
+    }
+
     const textElements = document.querySelectorAll(".TextArea h1");
     if (current_Index < Para.paragraph.length) {
       const typedChar = event.key.toLowerCase();
@@ -103,6 +121,7 @@ const Typing = () => {
         
       } else if (event.key === " ") {
         // Handle spaces
+        event.preventDefault();
         textElements[current_Index].classList.add("text-red-600");
         current_Index++;
       } else if (event.key === "Backspace") {
@@ -122,6 +141,9 @@ const Typing = () => {
       }
     }
     else{
+      document.removeEventListener("keydown",keydown);
+      console.log(IntervalId)
+      stopClock();
       console.log("done")
     }
     setwordscount(current_Index);
@@ -156,8 +178,11 @@ const Typing = () => {
     startClock();
     current_Index = 0;
     document.addEventListener("keydown", keydown);
+    // document.removeEventListener("keydown", starttyping);
     
   };
+
+  
 
   // Function to restart Typing
 
@@ -190,7 +215,10 @@ const Typing = () => {
   // Creating a button on ref
   const buttonref = useRef<HTMLButtonElement>(null);
 
-
+  useEffect(() => {
+    getPara();
+    // document.addEventListener("keydown", starttyping);
+  }, []);
 
   return (
     <div className="h-[80vh] relative flex flex-col ">
@@ -223,12 +251,14 @@ const Typing = () => {
         </div>
       </div>
 
-      <div className="w-full relative flex  mt-[10vh] flex-col  whitespace-normal ">
+      <div className="w-full  relative flex  mt-[10vh] flex-col  whitespace-normal ">
         <h1 className="mx-[5vw] font-poppins font-semibold">{`${wordscount}/${Para?.number_of_words}`}</h1>
-        <div className="mt-[4vh] mx-[5vw] flex flex-wrap font-Jetbrains TextArea">
+        <div className="mt-[4vh] rounded-lg shadow-3xl p-[5vh] mx-[5vw] flex flex-wrap font-Jetbrains TextArea">
           {letter}
         </div>
       </div>
+      <h1 className="font-poppins font-bold text-2xl mt-[8vh]">Results</h1>
+      <Results speed ={ speed } time={Time} accuracy={Accuracy}/>
     </div>
   );
 };
