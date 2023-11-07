@@ -157,15 +157,12 @@ const Typing = () => {
     } else {
       setAccuracy(Math.round((correct / Para?.paragraph?.length) * 100));
       document.removeEventListener("keydown", keydown);
-      if (FinalResult && speed && Time && Accuracy) {
-        FinalResult.push({ speed: speed, time: Time, accuracy: Accuracy });
-        sessionStorage.setItem("results", JSON.stringify(FinalResult));
-        console.log(FinalResult);
-      }
       console.log(IntervalId);
       stopClock();
+      typingSpeed(wordc);
       console.log("done");
       setResult(true);
+      
     }
     setwordscount(current_Index);
     if (event.key !== "Backspace") typingSpeed(++wordc);
@@ -247,6 +244,15 @@ const Typing = () => {
     }
   }, []);
 
+  useEffect(() => {
+    console.log(Accuracy)
+    if (Result && speed && Time && Accuracy) {
+      const updated_result = [...FinalResult, { speed, Time, Accuracy }];
+      sessionStorage.setItem("results", JSON.stringify(updated_result));
+      console.log(FinalResult);
+    }
+  }, [Accuracy]);
+
   return (
     <div className="h-[80vh] relative flex flex-col ">
       <div className="flex mt-[5vh] justify-between items-center w-full">
@@ -296,8 +302,8 @@ const Typing = () => {
         FinalResult.map((data: any) => (
           <Results
             speed={data.speed}
-            time={data.time}
-            accuracy={data.accuracy}
+            time={data.Time}
+            accuracy={data.Accuracy}
           />
         ))}
       {Result && <Results speed={speed} time={Time} accuracy={Accuracy} />}
