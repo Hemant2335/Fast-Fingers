@@ -6,9 +6,10 @@ import { Server } from 'http';
 import { config } from 'dotenv';
 const app : Application = express();
 
+
 config();
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://0.0.0.0:27017/FingerFast';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb_db:27017/FingerFast';
 
 // Settings
 app.use(cors());

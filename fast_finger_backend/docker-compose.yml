@@ -1,0 +1,15 @@
+services:
+  mongodb_db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+  fast-finger-backend:
+    build: ./
+    command: npx nodemon --exec ts-node src/index.ts
+    ports:
+      - "4000:4000"
+
+volumes:
+  mongodb-data:
